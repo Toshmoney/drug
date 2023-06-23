@@ -1,0 +1,201 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.main-about{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color:beige;
+}
+
+.d-flex{
+    display: flex;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px 20px;
+    gap: 20px;
+
+}
+
+.d-flex h2{
+    font-size: 30px;
+    text-align: center;
+}
+
+.d-flex p{
+    font-size: 22px;
+    line-height: 30px;
+    text-align: center;
+}
+
+.hero-grid-2{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 30px;
+    padding: 40px 20px;
+}
+
+.hero-grid-2 div{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.hero-grid-2 div h3{
+    font-size: 25px;
+}
+
+.hero-grid-2 div h3::first-letter{
+    font-size: 50px;
+    color: brown;
+}
+
+.hero-grid-2 div p{
+    font-size: 20px;
+    line-height: 30px;
+}
+
+/* ======= Report Setion ======== */
+
+.report-section{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.report-text{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.report-text h2{
+    font-size: 30px;
+    text-align: center;
+}
+
+.report-text p{
+    font-size: 22px;
+    text-align: center;
+}
+
+.report-form{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 20px;
+}
+
+.sign-up-form{
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+.sign-up-form .form-control{
+    width: 50%;
+}
+
+main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.sign-up-section{
+    width: 100%;
+}
+
+.sign-up-section h2{
+    text-align: center;
+    font-size: 30px;
+}
+
+.sign-up-text{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    height: 20vh;
+    gap: 20px;
+    flex-direction: column;
+}
+
+.sign-up-text p{
+    font-size: 25px;
+}
+
+.sign-up-text h2{
+    font-size: 30px;
+    color: brown;
+}
+
+.sign-in-main{
+    height: 70vh;
+}
+.form-control input{
+    height: 45px;
+    border-radius: 10px;
+    width: 100%;
+    padding: 10px;
+}
+
+.form-control input::placeholder{
+    padding: 10px;
+}
+
+.form-control label{
+    font-size: 22px;
+    color: brown;
+}
+
+.form-control{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.sign-in{
+    height: 40vh;
+}
+@media screen and (max-width:950px) {
+    .d-flex{
+        width: 100%;
+    }
+    .hero-grid-2{
+        grid-template-columns: 1fr;
+    }
+    .sign-up-form{
+        grid-template-columns: 1fr;
+    }
+
+    .sign-in .form-control{
+        width: 100%;
+    }
+
+    .report-text{
+        gap: 20px;
+    }
+
+    .sign-up-form .form-control{
+        width: 100%;
+    }
+}
