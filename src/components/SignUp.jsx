@@ -36,7 +36,7 @@ const handleSubmit = async(event)=>{
     return <Navigate to={"/sign-up"} />
 
   }
-  const response = await fetch("http://localhost:7000/sign-up",{
+  const response = await fetch("https://drug-verification.onrender.com/sign-up",{
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body:JSON.stringify(userDetails)

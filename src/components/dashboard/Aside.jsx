@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import "./dashboard.css"
 
+
 const Aside = () => {
     const [userData, setUserData] = useState(null);
 
@@ -8,9 +9,10 @@ const Aside = () => {
 
     const getData = async()=>{
        try {
-        await fetch("http://localhost:7000/dashboard")
+        const response = await fetch("https://drug-verification.onrender.com/dashboard")
         .then(response => response.json())
-        .then((res) => {setUserData(res)})
+        console.log(response);
+        setUserData(response)
        } catch (error) {
         console.log(error);
        }

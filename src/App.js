@@ -5,7 +5,6 @@ import Report from './components/Report';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Aside from './components/dashboard/Aside';
-import Index from './components/dashboard/Index';
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import Drugs from './components/dashboard/Drugs';
 import Profile from './components/dashboard/Profile';

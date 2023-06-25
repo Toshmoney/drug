@@ -1,8 +1,5 @@
 import React from 'react'
-import MainDashboard from './NewDrug'
-import Aside from './Aside'
-import Profile from './Profile'
-import Drugs from './Drugs'
+import Aside from './Aside';
 
 const Index = () => {
   return (

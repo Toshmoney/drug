@@ -17,7 +17,7 @@ const Profile = () => {
     useEffect(()=>{
         async function getProfile(){
             try {
-                await fetch("http://localhost:7000/profile")
+                await fetch("https://drug-verification.onrender.com/profile")
                 .then(response => response.json())
                 .then(res => setProf(res))
             } catch (error) {
@@ -27,6 +27,10 @@ const Profile = () => {
 
         getProfile()
     },[])
+
+    if(!prof){
+        return "Loading .."
+    }
   return (
     <section className='aside-main-flex'>
         <aside className={isActive? "switch-aside":"aside"}>

@@ -28,11 +28,10 @@ const handleSubmit = async(event)=>{
   if(!userDetails.email || !userDetails.password){
     return alert("Missing field!!")
   }
-  const response = await fetch("http://localhost:7000/sign-in",{
+  const response = await fetch("https://drug-verification.onrender.com/sign-in",{
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body:JSON.stringify(userDetails),
-    credentials: "include"
 })
 if (response.ok){
   alert("Logged In successfully!")
