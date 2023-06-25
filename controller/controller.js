@@ -14,7 +14,9 @@ const profile = async(req, res)=>{
     // res.json(req.cookie)
     const {token} = req.cookies;
     jwt.verify(token, secret, {}, (err, info)=>{
-        if(err) throw err;
+        if(err){
+            res.json(err)
+        }
         res.json(info)
     })
 }
