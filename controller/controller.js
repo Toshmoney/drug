@@ -30,7 +30,7 @@ const login = async(req, res)=>{
             if(err)throw err;
             // res.json(token)
             res.cookie('token', token).json({token})
-            res.status(200).json(userDoc)
+            res.json(userDoc)
 
         })
         // res.status(200).json(userDoc)
@@ -115,12 +115,12 @@ const registerCompany = async (req, res, next) => {
 
 const dashboard = async(req, res)=>{
         try {
-            const {email} = req.body;
-            const userDoc = await User.findOne({email:email});
+            const {_id} = req.body;
+            const userDoc = await User.findOne({_id});
             if(userDoc){
                 res.json(userDoc)
             }else{
-                res.status(404).json({"err": "No user found with "+email})
+                res.json({"err": "No user found with "+_id})
             }
            } catch (error) {
             console.log(error);
