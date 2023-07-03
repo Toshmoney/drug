@@ -25,7 +25,6 @@ const DrugSchema = new Schema({
     },
     nafdac:{
         type: String,
-        required:true
     },
     isAuthentic:{
         type: Boolean,
