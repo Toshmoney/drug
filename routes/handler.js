@@ -6,12 +6,14 @@ const {
     dashboard,
     login,
     logout,
-    profile
+    profile,
+    regDrugs
 } = require("../controller/controller");
 
 const router = express.Router();
 
 router.route("/drug/:code").get(checkDrugAuthenticity)
+router.route("/drugs").get(regDrugs)
 router.route("/log-out").get(logout)
 router.route("/register-drug").post(registerDrug);
 router.route("/sign-up").post(registerCompany);

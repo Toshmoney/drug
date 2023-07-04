@@ -10,12 +10,12 @@ express().use(cookieParser())
 const salt = bcrypt.genSaltSync(9);
 const secret = "ghjft56ucvbkuyln8vcr6xsdtvygh";
 
-const profile = async(req, res)=>{
+const profile = (req, res)=>{
     // res.json(req.cookie)
     const {token} = req.cookies;
     jwt.verify(token, secret, {}, (err, info)=>{
         if(err){
-            res.json(err)
+          return res.json(err)
         }
         res.json(info)
     })
@@ -30,7 +30,7 @@ const login = async(req, res)=>{
             if(err)throw err;
             // res.json(token)
             res.cookie('token', token).json({token})
-            res.json(userDoc)
+            // res.json(userDoc)
 
         })
         // res.status(200).json(userDoc)
@@ -41,7 +41,8 @@ const login = async(req, res)=>{
 }
 
 const logout = async(req, res)=>{
-    res.cookie('token', '').json('ok')
+    res.cookie('token', '')
+    res.status(200).json({ message: 'Logged out successfully' });
 }
 
 const registerDrug = async(req, res)=>{
@@ -95,6 +96,29 @@ const checkDrugAuthenticity = async(req, res)=>{
     }
 }
 
+const regDrugs = (req, res)=>{
+
+    const {token} = req.cookies;
+    jwt.verify(token, secret, {}, async(err, info)=>{
+    if(err){
+       return res.json(err)
+    }
+    const userId = info.details.name;
+    const drugs =  await Drug.find()
+    .populate("owner")
+
+    if(drugs){
+        const serch = drugs.filter((drug)=>{
+            if(drug.owner.name === userId){
+                return drug
+            }
+        })
+
+        return res.json(serch)
+    }
+})
+}
+
 const registerCompany = async (req, res, next) => {
     const {
         name,
@@ -102,6 +126,14 @@ const registerCompany = async (req, res, next) => {
         regNumber,
         password,
     } = req.body
+
+    const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exists');
+  }
+
     try {
         const userDoc = await User.create({
         name,email, regNumber, 
@@ -113,25 +145,18 @@ const registerCompany = async (req, res, next) => {
    }
 }
 
-const dashboard = async(req, res)=>{
-        try {
-            const {_id} = req.body;
-            const userDoc = await User.findOne({_id});
-            if(userDoc){
-                res.json(userDoc)
-            }else{
-                res.json({"err": "No user found with "+_id})
-            }
-           } catch (error) {
-            console.log(error);
-           }
 
-           
 
-//    const data =  await dashboardData(req.user);
-//    res.status(200).json(data)
-   
+const dashboard = (req, res)=>{
+
+        const {token} = req.cookies;
+    jwt.verify(token, secret, {}, (err, info)=>{
+        if(err){
+           return res.json(err)
         }
+        return res.json(info);
+    })
+}
 
 module.exports = {
 registerCompany,
@@ -140,5 +165,6 @@ checkDrugAuthenticity,
 dashboard,
 login,
 logout,
-profile
+profile,
+regDrugs
 }
