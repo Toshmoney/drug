@@ -15,6 +15,9 @@ const UserSchema = new Schema({
         type: String,
         unique: true
     },
+    address: {
+        type: String
+    },
     regNumber:{
         type:String,
         required:true

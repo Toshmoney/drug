@@ -1,3 +1,4 @@
+require("dotenv").config()
 const express = require("express");
 const Drug = require("../model/Drug")
 const User = require("../model/User")
@@ -8,10 +9,9 @@ const dashboardData = require("../utils/dashboardData");
 
 express().use(cookieParser())
 const salt = bcrypt.genSaltSync(9);
-const secret = "ghjft56ucvbkuyln8vcr6xsdtvygh";
+const secret = process.env.secrete
 
 const profile = (req, res)=>{
-    // res.json(req.cookie)
     const {token} = req.cookies;
     jwt.verify(token, secret, {}, (err, info)=>{
         if(err){
@@ -23,20 +23,24 @@ const profile = (req, res)=>{
 
 const login = async(req, res)=>{
     const {email, password} = req.body;
-    const userDoc = await User.findOne({email});
-    const passOk = bcrypt.compareSync(password, userDoc.password)
-    if(passOk){
+    try {
+        const userDoc = await User.findOne({email});
+        if(!userDoc){
+                return res.status(401).json({ message: 'Incorrect Username' });
+        }
+
+        const passOk = bcrypt.compareSync(password, userDoc.password)
+
+        if(!passOk){
+            return res.status(401).json({ message: 'Incorrect Password' });
+        }
+
         jwt.sign({username:email, details: userDoc, id : userDoc._id}, secret, {}, (err, token)=>{
-            if(err)throw err;
-            // res.json(token)
-            res.cookie('token', token).json({token})
-            // res.json(userDoc)
-
+                if(err)throw err;
+                res.cookie('token', token).json({token})
         })
-        // res.status(200).json(userDoc)
-
-    }else{
-        res.json({"msg": "Invalid Login credentials"})
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 }
 
@@ -119,12 +123,13 @@ const regDrugs = (req, res)=>{
 })
 }
 
-const registerCompany = async (req, res, next) => {
+const registerCompany = async (req, res) => {
     const {
         name,
         email,
         regNumber,
         password,
+        address
     } = req.body
 
     const userExists = await User.findOne({ email });
@@ -136,9 +141,8 @@ const registerCompany = async (req, res, next) => {
 
     try {
         const userDoc = await User.create({
-        name,email, regNumber, 
+        name,email, regNumber, address,
         password: bcrypt.hashSync(password, salt)});
-        console.log("User registered successfully, you can now log in as " + userDoc.email);
         res.status(200).json(userDoc)
    } catch (error) {
         res.status(400).json(error)
