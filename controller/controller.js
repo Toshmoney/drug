@@ -17,7 +17,7 @@ const profile = (req, res)=>{
         if(err){
           return res.json(err)
         }
-        res.json(info)
+        res.json(info.details)
     })
 }
 
@@ -158,7 +158,7 @@ const dashboard = (req, res)=>{
         if(err){
            return res.json(err)
         }
-        return res.json(info);
+        return res.json(info.details);
     })
 }
 
