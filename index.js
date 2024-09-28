@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser")
 
-app.use(cors({credentials:true, origin: "http://localhost:3000"}))
+app.use(cors({origin: "*"}))
 app.use(cookieParser())
 
 
@@ -21,8 +21,7 @@ app.use(express.json());
     const start = async()=>{
 
         try {
-            await connectDB()
-            console.log("Success!");
+            await connectDB("db connected")
             app.listen(port, ()=>{
               console.log(`Server started successfully on port ${port}`)
             })

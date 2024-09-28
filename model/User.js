@@ -6,7 +6,7 @@ const UserSchema = new Schema({
         required:[true, "Company name is required!"],
         type: String
     },
-    drug: {
+    drugs: {
         type:mongoose.Schema.Types.ObjectId,
         ref: "Drug",
     },
@@ -25,6 +25,9 @@ const UserSchema = new Schema({
     password: {
         required: [true, "Password is required"],
         type: String,
+    },
+    isVerified :{
+        type:Boolean,
     }
 },
 {

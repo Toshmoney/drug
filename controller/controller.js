@@ -9,16 +9,16 @@ const dashboardData = require("../utils/dashboardData");
 
 express().use(cookieParser())
 const salt = bcrypt.genSaltSync(9);
-const secret = process.env.secrete
+const secret = process.env.JWT_SECRET
 
-const profile = (req, res)=>{
-    const {token} = req.cookies;
-    jwt.verify(token, secret, {}, (err, info)=>{
-        if(err){
-          return res.json(err)
-        }
-        res.json(info.details)
-    })
+const profile = async(req, res)=>{
+    const user = req.user;
+    const userData = await User.findById(user);
+    if(!user){
+        return res.status(404).json({error:"user not found"})
+    }
+
+    return res.status(200).json({user:userData})
 }
 
 const login = async(req, res)=>{
@@ -26,13 +26,13 @@ const login = async(req, res)=>{
     try {
         const userDoc = await User.findOne({email});
         if(!userDoc){
-                return res.status(401).json({ message: 'Incorrect Username' });
+                return res.status(401).json({ message: 'User not found' });
         }
 
         const passOk = bcrypt.compareSync(password, userDoc.password)
 
         if(!passOk){
-            return res.status(401).json({ message: 'Incorrect Password' });
+            return res.status(401).json({ message: 'Incorrect username or password' });
         }
 
         jwt.sign({username:email, details: userDoc, id : userDoc._id}, secret, {}, (err, token)=>{
@@ -40,45 +40,47 @@ const login = async(req, res)=>{
                 res.cookie('token', token).json({token})
         })
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: error.message });
     }
 }
 
 const logout = async(req, res)=>{
     res.cookie('token', '')
-    res.status(200).json({ message: 'Logged out successfully' });
+    return res.status(200).json({ message: 'Logged out successfully' });
 }
 
 const registerDrug = async(req, res)=>{
 
-    const {token} = req.cookies;
-    jwt.verify(token, secret, {}, async(err, info)=>{
-        if(err) throw err;
-        const{
+    const user = req.user;
+    const{
+        drug_name,
+        manufac_date,
+        exp_date,
+        drug_type,
+        product_qty,
+        nafdac,
+    } = req.body;
+    try {
+        const createdDrug = await Drug.create({
             drug_name,
             manufac_date,
             exp_date,
+            owner:user,
             drug_type,
             product_qty,
             nafdac,
-        } = req.body;
-        try {
-            const createdDrug = await Drug.create({
-                drug_name,
-                manufac_date,
-                exp_date,
-                owner:info.id,
-                drug_type,
-                product_qty,
-                nafdac,
-                
-            });
-            res.json(createdDrug)
-    
-            } catch (error) {
-               res.json(error) 
-            }
-    })
+            
+        });
+
+        if(!createdDrug){
+            return res.status(400).json({error: "Error creating a drug"})
+        }
+        res.json(createdDrug)
+
+        } catch (error) {
+           res.json(error) 
+        }
+
 }
 
 
@@ -88,11 +90,11 @@ const checkDrugAuthenticity = async(req, res)=>{
         const drug_details = await Drug.findOne({verif_code})
         .populate("owner", ["name"])
         if(drug_details){
-            res.status(200).json(drug_details)
             drug_details.count++
             drug_details.save()
+            return res.status(200).json(drug_details)
         }else{
-            res.status(404).json({"error": "The Drug you are trying to verify is suspected to be fake. As it is not found in our database!"})
+            res.status(404).json({error: "The Drug you are trying to verify is suspected to be fake. As it is not found in our database!"})
         }
         
     } catch (error) {
@@ -100,27 +102,15 @@ const checkDrugAuthenticity = async(req, res)=>{
     }
 }
 
-const regDrugs = (req, res)=>{
+const regDrugs = async(req, res)=>{
+    const user = req.user;
+    const drugs =  await Drug.find({owner:user});
 
-    const {token} = req.cookies;
-    jwt.verify(token, secret, {}, async(err, info)=>{
-    if(err){
-       return res.json(err)
+    if(!regDrugs){
+        return res.status(404).json({error:"No drugs registered yet!"})
     }
-    const userId = info.details.name;
-    const drugs =  await Drug.find()
-    .populate("owner")
 
-    if(drugs){
-        const serch = drugs.filter((drug)=>{
-            if(drug.owner.name === userId){
-                return drug
-            }
-        })
-
-        return res.json(serch)
-    }
-})
+    return res.status(200).json({drugs})
 }
 
 const registerCompany = async (req, res) => {
@@ -130,20 +120,34 @@ const registerCompany = async (req, res) => {
         regNumber,
         password,
         address
-    } = req.body
+    } = req.body;
+
+    try {
+
+        if(!name ||
+            !email ||
+            !regNumber ||
+            !password ||
+            !address){
+                return res.status(400).json({error:"All inputs required!"})
+            }
 
     const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400);
-    throw new Error('User already exists');
+    return res.status(400).json({error:"User already exists"})
   }
 
-    try {
-        const userDoc = await User.create({
-        name,email, regNumber, address,
-        password: bcrypt.hashSync(password, salt)});
-        res.status(200).json(userDoc)
+    const userDoc = await new User ({
+    name,email, regNumber, address,
+    password: bcrypt.hashSync(password, salt)});
+
+    if(!userDoc){
+        return res.status(400).json({error:"Registration failed, please check all the input."})
+    }
+
+    await userDoc.save()
+    return res.status(200).json(userDoc)
    } catch (error) {
         res.status(400).json(error)
    }
@@ -151,15 +155,14 @@ const registerCompany = async (req, res) => {
 
 
 
-const dashboard = (req, res)=>{
+const dashboard = async(req, res)=>{
+    const user = req.user;
+    const userData = await User.findById(user).populate("drugs");
+    if(!user){
+        return res.status(404).json({error:"user not found"})
+    }
 
-        const {token} = req.cookies;
-    jwt.verify(token, secret, {}, (err, info)=>{
-        if(err){
-           return res.json(err)
-        }
-        return res.json(info.details);
-    })
+    return res.status(200).json({user:userData})
 }
 
 module.exports = {
